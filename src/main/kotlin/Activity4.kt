@@ -52,7 +52,7 @@ fun main() {
                     println("\nProduct added to inventory!")
                     println("Product: Name: $name, Quantity: $quantity, Price: $formattedPrice, Condition: $condition, Remarks: $remarks")
                 } else {
-                    println("\nMaximum number of products reached.")
+                    println("\nMaximum number of products has been reached.")
                 }
             }
             2 -> {
