@@ -13,7 +13,7 @@ fun main() {
         val totalGrade = grades.values.sum()
         val averageGrade = totalGrade / subjects.size
         println("Grades for $name:")
-        grades.forEach { (subject, grade) ->
+        grades.forEach { (subject, grade)->
             println("$subject: $grade")
         }
         println("$name, your average grade is : $averageGrade")
