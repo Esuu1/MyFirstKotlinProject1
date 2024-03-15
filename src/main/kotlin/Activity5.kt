@@ -5,7 +5,7 @@ fun main() {
     var continueAddStudent = true
 
     while (continueAddStudent) {
-        println("Welcome to the school library system")
+        println("Welcome to the school library system!")
 
         print("Enter student's ID: ")
         val studentId = readLine()?.let { "${it.substring(0, 2)}-${it.substring(2)}" } ?: ""
