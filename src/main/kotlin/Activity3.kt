@@ -18,7 +18,7 @@ fun getBirthYear():Int{
         input
     }
 }
-fun calculateAge(birthYear: Int): Int
+fun calculateAge(birthYear: Int):Int
 {
     val currentYear = 2024
     return currentYear - birthYear
