@@ -45,7 +45,6 @@ data class Borrower(
     val studentName: String,
     val yearLevel: String,
     val course: String,
-    val subjects: MutableList<String>,
     val borrowedBooks: MutableList<String>,
     val borrowedDate: String
 )
@@ -113,7 +112,7 @@ fun addBorrower(): Borrower {
     val currentDate = LocalDate.now()
     val formattedDate = currentDate.format(DateTimeFormatter.ofPattern("MMMM dd, yyyy"))
 
-    return Borrower(studentId, studentName, yearLevel, course, mutableListOf(), borrowedBooks, formattedDate)
+    return Borrower(studentId, studentName, yearLevel, course, borrowedBooks, formattedDate)
 }
 
 
