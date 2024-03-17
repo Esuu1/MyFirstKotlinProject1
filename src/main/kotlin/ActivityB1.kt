@@ -11,9 +11,9 @@ fun main() {
 
     while (continueProgram) {
         println("\nBook Borrower System")
-        println("[1] Add Borrower")
-        println("[2] Return Borrower")
-        println("[3] Display Borrowers")
+        println("[1] Cater Transactions")
+        println("[2] Return Books")
+        println("[3] Display Records")
         println("[4] Exit")
         print("Enter your choice: ")
         val choice = readLine()?.toIntOrNull()
@@ -45,8 +45,13 @@ data class Borrower(
     val studentName: String,
     val yearLevel: String,
     val course: String,
-    val borrowedBooks: MutableList<String>,
+    val borrowedBooks: MutableList<BorrowedBook>,
     val borrowedDate: String
+)
+
+data class BorrowedBook(
+    val book: String,
+    val returnDate: String
 )
 
 fun addBorrower(): Borrower {
@@ -84,7 +89,7 @@ fun addBorrower(): Borrower {
         else -> "Unknown"
     }
 
-    val borrowedBooks = mutableListOf<String>()
+    val borrowedBooks = mutableListOf<BorrowedBook>()
     var continueAddBook = true
 
     while (continueAddBook) {
@@ -98,20 +103,21 @@ fun addBorrower(): Borrower {
         } else {
             if (borrowedBook !in books) {
                 println("Book '$borrowedBook' is not available.")
-            } else if (borrowedBook in borrowedBooks) {
+            } else if (borrowedBooks.any { it.book == borrowedBook }) {
                 println("Book '$borrowedBook' already added.")
             } else {
+                print("Enter return date for $borrowedBook: ")
+                val returnDate = readLine() ?: ""
+                val returnDateFormatted = LocalDate.parse(returnDate, DateTimeFormatter.ofPattern("MM/dd/yyyy"))
+                val formattedReturnDate = returnDateFormatted.format(DateTimeFormatter.ofPattern("MMMM dd, yyyy"))
                 println("Book '$borrowedBook' added.")
-                if (borrowedBook != null) {
-                    borrowedBooks.add(borrowedBook)
-                }
+                borrowedBooks.add(BorrowedBook(borrowedBook!!, formattedReturnDate))
             }
         }
     }
 
     val currentDate = LocalDate.now()
     val formattedDate = currentDate.format(DateTimeFormatter.ofPattern("MMMM dd, yyyy"))
-
     return Borrower(studentId, studentName, yearLevel, course, borrowedBooks, formattedDate)
 }
 
@@ -120,7 +126,7 @@ fun returnBorrower(borrowers: MutableList<Borrower>) {
     if (borrowers.isNotEmpty()) {
         println("\nReturning Borrower:")
         println("Enter student's ID to return: ")
-        val studentId = readLine()
+        val studentId = readLine()?.let { "${it.substring(0, 2)}-${it.substring(2)}" } ?: ""
         val borrower = borrowers.find { it.studentId == studentId }
 
         if (borrower != null) {
@@ -145,15 +151,16 @@ fun displayBorrowers(borrowers: List<Borrower>) {
             println("Year Level: ${borrower.yearLevel}")
             println("Borrowed Date: ${borrower.borrowedDate}")
             if (borrower.borrowedBooks.isNotEmpty()) {
-                println("Borrowed Books: ${borrower.borrowedBooks.joinToString(", ")}")
+                println("Borrowed Books:")
+                borrower.borrowedBooks.forEachIndexed { i, borrowedBook ->
+                    println("${i + 1}. Book: ${borrowedBook.book}, Return Date: ${borrowedBook.returnDate}")
+                }
             } else {
-                Logger.log.error { "Books are not borrowed." }
                 println("No books borrowed.")
             }
             println()
         }
     } else {
-        Logger.log.error { "No displayed borrowers." }
         println("\nNo borrowers to display.")
     }
 }
