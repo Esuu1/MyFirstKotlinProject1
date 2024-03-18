@@ -1,9 +1,16 @@
+import mu.KotlinLogging
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
 val books = arrayListOf("ENGLISH", "MATH", "FILIPINO", "SCIENCE")
 val courses = arrayListOf("BSIT", "BSED", "BSBA", "BSHM", "BEED")
 
+class Logger {
+    companion object {
+        val log = KotlinLogging.logger {}
+
+    }
+}
 fun main() {
     val borrowers = mutableListOf<Borrower>()
 
@@ -24,7 +31,7 @@ fun main() {
                 borrowers.add(borrower)
             }
             2 -> {
-                returnBorrower(borrowers)
+                returnBooks(borrowers)
             }
             3 -> {
                 displayBorrowers(borrowers)
@@ -122,7 +129,7 @@ fun addBorrower(): Borrower {
 }
 
 
-fun returnBorrower(borrowers: MutableList<Borrower>) {
+fun returnBooks(borrowers: MutableList<Borrower>) {
     if (borrowers.isNotEmpty()) {
         println("\nReturning Borrower:")
         println("Enter student's ID to return: ")
