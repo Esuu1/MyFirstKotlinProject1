@@ -32,15 +32,20 @@ fun main() {
             }
             2 -> {
                 returnBooks(borrowers)
+
             }
             3 -> {
                 displayBorrowers(borrowers)
+
             }
             4 -> {
+                Logger.log.info { "System Exit." }
+
                 continueProgram = false
                 println("Exiting the Book Borrower System. Goodbye!")
             }
             else -> {
+                Logger.log.error { "Invalid user choice." }
                 println("Invalid choice. Please try again.")
             }
         }
@@ -62,6 +67,7 @@ data class BorrowedBook(
 )
 
 fun addBorrower(): Borrower {
+    Logger.log.info { "User chooses 1." }
     println("\nAdding Borrower:")
     print("Enter student's ID: ")
     val studentId = readLine()?.let { "${it.substring(0, 2)}-${it.substring(2)}" } ?: ""
@@ -130,6 +136,7 @@ fun addBorrower(): Borrower {
 
 
 fun returnBooks(borrowers: MutableList<Borrower>) {
+    Logger.log.info { "User chooses 2." }
     if (borrowers.isNotEmpty()) {
         println("\nReturning Borrower:")
         println("Enter student's ID to return: ")
@@ -148,6 +155,8 @@ fun returnBooks(borrowers: MutableList<Borrower>) {
 }
 
 fun displayBorrowers(borrowers: List<Borrower>) {
+    Logger.log.info { "User chooses 3." }
+
     if (borrowers.isNotEmpty()) {
         println("\nList of Borrowers:")
         for ((index, borrower) in borrowers.withIndex()) {
