@@ -1,0 +1,263 @@
+import mu.KotlinLogging
+
+private val logger = KotlinLogging.logger {}
+val departments = arrayListOf("BSIT", "BSED", "BSBA", "BSHM", "BEED")
+
+data class Student(
+    val studentId: String,
+    var fullName: String,
+    var course: String,
+    var yearLevel: String,
+    var grades: MutableMap<String, Double>
+)
+
+class StudentGradeSystem {
+    private val students = mutableListOf<Student>()
+
+    fun addStudent(student: Student) {
+        students.add(student)
+        logger.info { "Student added: ${student.studentId}" }
+    }
+
+    fun deleteStudent(studentId: String) {
+        val student = students.find { it.studentId == studentId }
+        if (student != null) {
+            students.remove(student)
+            logger.info { "Student deleted: $studentId" }
+        } else {
+            logger.error { "Student with ID $studentId not found" }
+        }
+    }
+
+    fun editStudent(studentId: String, newStudent: Student) {
+        val index = students.indexOfFirst { it.studentId == studentId }
+        if (index != -1) {
+            students[index] = newStudent
+            logger.info { "Student information updated: $studentId" }
+        } else {
+            logger.error { "Student with ID $studentId not found" }
+        }
+    }
+
+    fun getStudentInfo(studentId: String): Student? {
+        return students.find { it.studentId == studentId }
+    }
+
+    fun calculateGWA(student: Student): Double {
+        val grades = student.grades
+        if (grades.isEmpty()) return 0.0
+        var totalUnits = 0.0
+        var totalGradePoints = 0.0
+
+        for ((subject, grade) in grades) {
+            val subjectUnits = getSubjectUnits(subject)
+            totalUnits += subjectUnits
+            totalGradePoints += grade * subjectUnits
+        }
+
+        return if (totalUnits > 0) totalGradePoints / totalUnits else 0.0
+    }
+
+    private fun getSubjectUnits(subject: String): Double {
+        return when (subject.toUpperCase()) {
+            "MATH", "ENGLISH", "SCIENCE", "FILIPINO", "HISTORY" -> 3.0
+            "PE", "ARTS" -> 2.0
+            else -> 0.0
+        }
+    }
+}
+
+fun main() {
+    println("Welcome to the Student Grade System")
+
+            val system = StudentGradeSystem()
+
+            while (true) {
+                println("\nStudent Grade System")
+                println("[1] Admin")
+                println("[2] Student")
+                println("[3] Exit")
+                print("Enter your choice: ")
+                when (readLine()?.toIntOrNull()) {
+                    1 -> adminMenu(system)
+                    2 -> studentMenu(system)
+                    3 -> {
+                        println("Exiting the Student Grade System. Goodbye!")
+                        return
+                    }
+
+                    else -> println("Invalid choice. Please try again.")
+                }
+            }
+    }
+
+fun adminMenu(system: StudentGradeSystem) {
+    var attempts = 0
+     val ADMIN_USERNAME = "admin"
+     val ADMIN_PASSWORD = "admin@123"
+
+    while (attempts < 3) {
+        print("Enter username: ")
+        val username = readLine()
+        print("Enter password (in asterisks): ")
+        val password = readLine()
+
+        if (username == ADMIN_USERNAME && password == ADMIN_PASSWORD) {
+            println("\nAdmin Menu")
+            println("[1] Add Student Info")
+            println("[2] Delete Student Info")
+            println("[3] Edit Student Info")
+            println("[4] Back to Main Menu")
+            print("Enter your choice: ")
+            when (readLine()?.toIntOrNull()) {
+                1 -> {
+                    val student = createStudent()
+                    system.addStudent(student)
+                }
+
+                2 -> {
+                    println("Enter student ID to delete: ")
+                    val studentId = readLine()?.let { id ->
+                        val sanitizedId = id.replace("-", "")
+                        if (sanitizedId.length >= 2) {
+                            "${sanitizedId.substring(0, 2)}-${sanitizedId.substring(2)}"
+                        } else {
+                            sanitizedId
+                        }
+                    } ?: ""
+                    system.deleteStudent(studentId ?: "")
+                }
+
+                3 -> {
+                    println("Enter student ID to edit: ")
+                    val studentId = readLine()?.let { id ->
+                        val sanitizedId = id.replace("-", "")
+                        if (sanitizedId.length >= 2) {
+                            "${sanitizedId.substring(0, 2)}-${sanitizedId.substring(2)}"
+                        } else {
+                            sanitizedId
+                        }
+                    } ?: ""
+                    val student = createStudent()
+                    system.editStudent(studentId, student)
+                }
+
+                4 -> return
+                else -> println("Invalid choice. Please try again.")
+            }
+        } else {
+            attempts++
+            println("Invalid username or password. Access denied.")
+            if (attempts < 3) {
+                println("You have ${3 - attempts} attempts remaining.")
+            } else {
+                println("Maximum attempts reached. Exiting...")
+            }
+        }
+    }
+}
+
+fun studentMenu(system: StudentGradeSystem) {
+    println("\nStudent Menu")
+    println("[1] Search Student Information")
+    println("[2] Back to Main Menu")
+    print("Enter your choice: ")
+    when (readLine()?.toIntOrNull()) {
+        1 -> {
+            println("Enter student ID: ")
+            val studentId = readLine()?.let { id ->
+                val sanitizedId = id.replace("-", "")
+                if (sanitizedId.length >= 2) {
+                    "${sanitizedId.substring(0, 2)}-${sanitizedId.substring(2)}"
+                } else {
+                    sanitizedId
+                }
+            } ?: ""
+            val student = system.getStudentInfo(studentId )
+            if (student != null) {
+                displayStudentInfo(student, system)
+            } else {
+                println("Student not found.")
+            }
+        }
+        2 -> return
+        else -> println("Invalid choice. Please try again.")
+    }
+}
+
+fun createStudent(): Student {
+    println("Enter student ID: ")
+    val studentId = readLine()?.let { id ->
+        val sanitizedId = id.replace("-", "")
+        if (sanitizedId.length >= 2) {
+            "${sanitizedId.substring(0, 2)}-${sanitizedId.substring(2)}"
+        } else {
+            sanitizedId
+        }
+    } ?: ""
+
+    print("Enter student's first name: ")
+    val studentFname = readLine()?.toUpperCase() ?: ""
+    print("Enter student's Middle Name: ")
+    val studentMI = readLine()?.toUpperCase()?.firstOrNull()
+    print("Enter student's last name: ")
+    val studentLName = readLine()?.toUpperCase() ?: ""
+    val studentName = "$studentFname ${studentMI ?: ""}. $studentLName"
+    departments.forEachIndexed { index, course -> println("${index + 1}. $course") }
+    print("Enter your choice: ")
+    val courseChoice = readLine()?.toIntOrNull()
+    val course = departments.getOrNull(courseChoice?.minus(1) ?: -1) ?: ""
+
+    println("Enter student's year level:")
+    println("1. First year")
+    println("2. Second year")
+    println("3. Third year")
+    println("4. Fourth year")
+    print("Enter your choice: ")
+
+    var yearLevel = "Unknown"
+    var validChoice = false
+
+    while (!validChoice) {
+        val yearLevelChoice = readLine()?.toIntOrNull()
+
+        yearLevel = when (yearLevelChoice) {
+            1 -> "First year"
+            2 -> "Second year"
+            3 -> "Third year"
+            4 -> "Fourth year"
+            else -> {
+                println("Invalid choice. Please enter a number between 1 and 4.")
+                continue
+            }
+        }
+
+        validChoice = true
+    }
+
+    val grades = mutableMapOf<String, Double>()
+    val subjects = listOf("MATH", "ENGLISH", "SCIENCE", "FILIPINO", "HISTORY", "PE", "ARTS")
+    subjects.forEach { subject ->
+        println("Enter grade for $subject: ")
+        val grade = readLine()?.toDoubleOrNull() ?: 0.0
+        if(grade == null || grade <0 || grade > 100){
+            println("Invalid grade. Enter a valid grade.")
+            return@forEach
+        }
+        grades[subject] = grade
+    }
+
+    return Student(studentId, studentName, course, yearLevel, grades)
+}
+
+fun displayStudentInfo(student: Student, system: StudentGradeSystem) {
+    val gwa = String.format("%.2f", system.calculateGWA(student))
+    println("\nStudent Information")
+    println("| School ID | Name | Course | Year Level | GWA ")
+    println("| ${student.studentId} | ${student.fullName} | ${student.course} | ${student.yearLevel} | $gwa")
+    println("Grades:")
+    student.grades.forEach { (subject, grade) ->
+        println("$subject: $grade")
+    }
+}
+
